@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-Hahn.CurrencyRates.Worker-6dbf3c4d-59e9-4a43-a5c9-716ee957d01d</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.17" />
+    <PackageReference Include="Hangfire.SqlServer" Version="1.8.17" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.1">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructure\Hahn.CurrencyRates.Infrastructure\Hahn.CurrencyRates.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Hahn.CurrencyRates.Jobs\Hahn.CurrencyRates.Jobs.csproj" />
+    <ProjectReference Include="..\..\Core\Hahn.CurrencyRates.Application\Hahn.CurrencyRates.Application.csproj" />
+  </ItemGroup>
+</Project>
