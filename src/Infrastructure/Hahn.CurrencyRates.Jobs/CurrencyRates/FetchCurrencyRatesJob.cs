@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Hahn.CurrencyRates.Application.Commands;
@@ -15,8 +16,7 @@ public class FetchCurrencyRatesJob
     private readonly IMediator _mediator;
     private readonly ILogger<FetchCurrencyRatesJob> _logger;
 
-    private static readonly string[] TargetCurrencies = { "EUR", "GBP", "JPY" };
-    private const string BaseCurrency = "USD";
+    private static readonly string[] AvailableCurrencies = { "USD", "EUR", "GBP", "JPY" };
 
     public FetchCurrencyRatesJob(
         IExternalRatesService externalRatesService,
@@ -28,38 +28,54 @@ public class FetchCurrencyRatesJob
         _logger = logger;
     }
 
-    public async Task ExecuteAsync(CancellationToken cancellationToken = default)
+    public async Task ExecuteAsync(string baseCurrency, CancellationToken cancellationToken = default)
     {
         try
         {
-            _logger.LogInformation("Starting to fetch currency rates at {Time}", DateTime.UtcNow);
+            _logger.LogInformation("Starting to fetch currency rates for base currency {BaseCurrency} at {Time}", 
+                baseCurrency, DateTime.UtcNow);
+
+            // Get target currencies (all currencies except the base currency)
+            var targetCurrencies = AvailableCurrencies
+                .Where(c => c != baseCurrency)
+                .ToArray();
 
             var response = await _externalRatesService.GetLatestRatesAsync(
-                BaseCurrency,
-                TargetCurrencies,
+                baseCurrency,
+                targetCurrencies,
                 cancellationToken);
 
             foreach (var (currency, rate) in response.Rates)
             {
                 await _mediator.Send(new UpsertCurrencyRateCommand(
-                    BaseCurrency,
+                    baseCurrency,
                     currency,
                     rate,
                     response.Timestamp), cancellationToken);
 
                 _logger.LogInformation(
                     "Updated rate for {BaseCurrency}/{TargetCurrency}: {Rate}",
-                    BaseCurrency,
+                    baseCurrency,
                     currency,
                     rate);
             }
 
-            _logger.LogInformation("Completed fetching currency rates at {Time}", DateTime.UtcNow);
+            _logger.LogInformation("Completed fetching currency rates for base currency {BaseCurrency} at {Time}", 
+                baseCurrency, DateTime.UtcNow);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error occurred while fetching currency rates");
+            _logger.LogError(ex, "Error occurred while fetching currency rates for base currency {BaseCurrency}", 
+                baseCurrency);
             throw;
+        }
+    }
+
+    public async Task ExecuteForAllBaseCurrenciesAsync(CancellationToken cancellationToken = default)
+    {
+        foreach (var baseCurrency in AvailableCurrencies)
+        {
+            await ExecuteAsync(baseCurrency, cancellationToken);
         }
     }
 }

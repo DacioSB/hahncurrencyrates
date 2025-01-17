@@ -15,10 +15,10 @@ public static class DependencyInjection
 
     public static void ConfigureJobs(IRecurringJobManager recurringJobManager)
     {
-        // Schedule the currency rates fetch job to run every hour
+        // Schedule the currency rates fetch job to run every hour for all base currencies
         recurringJobManager.AddOrUpdate<FetchCurrencyRatesJob>(
-            "fetch-currency-rates",
-            job => job.ExecuteAsync(default),
+            "fetch-all-currency-rates",
+            job => job.ExecuteForAllBaseCurrenciesAsync(default),
             Cron.Hourly());
     }
 }
