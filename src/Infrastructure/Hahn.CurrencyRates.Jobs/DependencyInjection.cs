@@ -19,6 +19,8 @@ public static class DependencyInjection
         recurringJobManager.AddOrUpdate<FetchCurrencyRatesJob>(
             "fetch-all-currency-rates",
             job => job.ExecuteForAllBaseCurrenciesAsync(default),
-            Cron.Hourly());
+            //each 5 minutes
+            "*/5 * * * *"
+            );
     }
 }

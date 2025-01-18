@@ -3,6 +3,7 @@ version: '3.8'
 services:
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
+    user: root
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=YourStrong!Passw0rd
@@ -10,8 +11,6 @@ services:
       - "1433:1433"
     volumes:
       - sqlserver_data:/var/opt/mssql
-    networks:
-      - hahn-network
 
 networks:
   hahn-network:

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { CurrencyRate, CurrencyRatesFilter } from '../types/CurrencyRate';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'http://localhost:5294/api';
 
 export const currencyRatesService = {
     async getCurrencyRates(filter?: CurrencyRatesFilter): Promise<CurrencyRate[]> {

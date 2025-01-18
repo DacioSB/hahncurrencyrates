@@ -2,7 +2,9 @@ using Hangfire;
 using Hangfire.SqlServer;
 using Hahn.CurrencyRates.Application;
 using Hahn.CurrencyRates.Infrastructure;
+using Hahn.CurrencyRates.Infrastructure.Persistence;
 using Hahn.CurrencyRates.Jobs;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -31,6 +33,13 @@ builder.Services.AddHangfire((sp, config) => config
 builder.Services.AddHangfireServer();
 
 var host = builder.Build();
+
+// Apply migrations
+using (var scope = host.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<CurrencyRatesDbContext>();
+    db.Database.Migrate();
+}
 
 // Configure Hangfire jobs
 var recurringJobManager = host.Services.GetRequiredService<IRecurringJobManager>();

@@ -1,5 +1,6 @@
 <template>
   <div class="card">
+    <Toast position="top-right" />
     <DataTable
       :value="currencyRates"
       :loading="loading"
@@ -13,9 +14,16 @@
       tableStyle="min-width: 50rem"
     >
       <template #header>
-        <div class="flex justify-content-between">
+        <div class="flex justify-content-between align-items-center">
           <h2>Currency Rates</h2>
           <div class="flex gap-2">
+            <Button 
+              icon="pi pi-refresh" 
+              @click="loadData" 
+              :loading="loading"
+              severity="secondary"
+              text
+            />
             <Dropdown
               v-model="filter.baseCurrency"
               :options="availableCurrencies"
@@ -55,9 +63,13 @@ import { ref, onMounted } from 'vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Dropdown from 'primevue/dropdown';
+import Button from 'primevue/button';
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
 import type { CurrencyRate, CurrencyRatesFilter } from '../types/CurrencyRate';
 import { currencyRatesService } from '../services/currencyRatesService';
 
+const toast = useToast();
 const availableCurrencies = ['USD', 'EUR', 'GBP', 'JPY'];
 const currencyRates = ref<CurrencyRate[]>([]);
 const loading = ref(false);
@@ -74,6 +86,12 @@ const loadData = async () => {
     currencyRates.value = await currencyRatesService.getCurrencyRates(filter.value);
   } catch (error) {
     console.error('Failed to load currency rates:', error);
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to load currency rates. Please try again.',
+      life: 5000
+    });
   } finally {
     loading.value = false;
   }
