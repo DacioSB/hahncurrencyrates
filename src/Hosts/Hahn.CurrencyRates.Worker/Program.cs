@@ -12,7 +12,7 @@ var builder = Host.CreateApplicationBuilder(args);
 
 // Add services to the container
 builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddInfrastructure(builder.Configuration, includeQueryContext: true);
 builder.Services.AddJobs();
 
 // Configure Hangfire

@@ -23,15 +23,31 @@ builder.Services.AddCors(options =>
 
 // Add application services
 builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddInfrastructure(builder.Configuration, includeQueryContext: true);
 
 var app = builder.Build();
 
-// Apply migrations
+// Apply migrations for both command and query databases
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<CurrencyRatesDbContext>();
-    db.Database.Migrate();
+    var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+
+    try
+    {
+        logger.LogInformation("Applying command database migrations...");
+        var commandDb = services.GetRequiredService<CurrencyRatesDbContext>();
+        await commandDb.Database.MigrateAsync();
+
+        logger.LogInformation("Applying query database migrations...");
+        var queryDb = services.GetRequiredService<QueryDbContext>();
+        await queryDb.Database.MigrateAsync();
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred while migrating the databases");
+        throw; // Re-throw to prevent application startup if migrations fail
+    }
 }
 
 // Configure the HTTP request pipeline

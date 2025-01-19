@@ -7,7 +7,7 @@ export interface CurrencyRate {
 
 export interface CurrencyRatesFilter {
     baseCurrency?: string;
-    targetCurrency?: string;
+    targetCurrencies?: string[];
     sortBy?: string;
     sortDescending?: boolean;
 }

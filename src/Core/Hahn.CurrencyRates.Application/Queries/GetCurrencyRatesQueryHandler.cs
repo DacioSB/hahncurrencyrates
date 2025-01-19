@@ -12,9 +12,9 @@ namespace Hahn.CurrencyRates.Application.Queries;
 public class GetCurrencyRatesQueryHandler 
     : IRequestHandler<GetCurrencyRatesQuery, IEnumerable<CurrencyRateDto>>
 {
-    private readonly ICurrencyRateRepository _repository;
+    private readonly ICurrencyRateQueryRepository _repository;
 
-    public GetCurrencyRatesQueryHandler(ICurrencyRateRepository repository)
+    public GetCurrencyRatesQueryHandler(ICurrencyRateQueryRepository repository)
     {
         _repository = repository;
     }
@@ -35,11 +35,12 @@ public class GetCurrencyRatesQueryHandler
                 r.Timestamp))
             .AsEnumerable();
 
-        // Apply target currency filter if specified
-        if (!string.IsNullOrWhiteSpace(request.TargetCurrency))
+        // Apply target currencies filter if specified
+        if (request.TargetCurrencies?.Any() == true)
         {
             dtos = dtos.Where(r => 
-                r.TargetCurrency.Equals(request.TargetCurrency, StringComparison.OrdinalIgnoreCase));
+                request.TargetCurrencies.Any(tc => 
+                    tc.Equals(r.TargetCurrency, StringComparison.OrdinalIgnoreCase)));
         }
 
         // Apply sorting

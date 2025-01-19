@@ -10,8 +10,10 @@ export const currencyRatesService = {
         if (filter?.baseCurrency) {
             params.append('baseCurrency', filter.baseCurrency);
         }
-        if (filter?.targetCurrency) {
-            params.append('targetCurrency', filter.targetCurrency);
+        if (filter?.targetCurrencies?.length) {
+            filter.targetCurrencies.forEach(currency => {
+                params.append('targetCurrencies', currency);
+            });
         }
         if (filter?.sortBy) {
             params.append('sortBy', filter.sortBy);

@@ -15,16 +15,31 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        bool includeQueryContext = false)
     {
-        // Register DbContext
+        // Register Command DbContext
         services.AddDbContext<CurrencyRatesDbContext>(options =>
             options.UseSqlServer(
                 configuration.GetConnectionString("DefaultConnection"),
                 b => b.MigrationsAssembly(typeof(CurrencyRatesDbContext).Assembly.FullName)));
 
-        // Register Repository
+        // Register Query DbContext if needed (for API)
+        if (includeQueryContext)
+        {
+            services.AddDbContext<QueryDbContext>(options =>
+                options.UseSqlServer(
+                    configuration.GetConnectionString("QueryConnection"),
+                    b => b.MigrationsAssembly(typeof(CurrencyRatesDbContext).Assembly.FullName)));
+        }
+
+        // Register Repositories
         services.AddScoped<ICurrencyRateRepository, CurrencyRateRepository>();
+        
+        if (includeQueryContext)
+        {
+            services.AddScoped<ICurrencyRateQueryRepository, CurrencyRateQueryRepository>();
+        }
 
         // Register External Rates Service
         services.Configure<ExternalRatesApiOptions>(

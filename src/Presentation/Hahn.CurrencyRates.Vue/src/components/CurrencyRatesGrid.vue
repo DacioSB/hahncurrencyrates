@@ -24,6 +24,13 @@
               severity="secondary"
               text
             />
+            <Button
+              icon="pi pi-filter-slash"
+              @click="clearFilters"
+              :disabled="loading"
+              severity="secondary"
+              text
+            />
             <Dropdown
               v-model="filter.baseCurrency"
               :options="availableCurrencies"
@@ -31,12 +38,13 @@
               class="w-full md:w-14rem"
               @change="loadData"
             />
-            <Dropdown
-              v-model="filter.targetCurrency"
+            <MultiSelect
+              v-model="filter.targetCurrencies"
               :options="availableCurrencies"
-              placeholder="Target Currency"
+              placeholder="Target Currencies"
               class="w-full md:w-14rem"
               @change="loadData"
+              display="chip"
             />
           </div>
         </div>
@@ -63,6 +71,7 @@ import { ref, onMounted } from 'vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Dropdown from 'primevue/dropdown';
+import MultiSelect from 'primevue/multiselect';
 import Button from 'primevue/button';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
@@ -75,10 +84,18 @@ const currencyRates = ref<CurrencyRate[]>([]);
 const loading = ref(false);
 const filter = ref<CurrencyRatesFilter>({
   baseCurrency: undefined,
-  targetCurrency: undefined,
+  targetCurrencies: [],
   sortBy: undefined,
   sortDescending: false,
 });
+
+const clearFilters = () => {
+  filter.value.baseCurrency = undefined;
+  filter.value.targetCurrencies = [];
+  filter.value.sortBy = undefined;
+  filter.value.sortDescending = false;
+  loadData();
+};
 
 const loadData = async () => {
   try {

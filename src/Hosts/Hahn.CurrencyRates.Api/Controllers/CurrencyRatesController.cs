@@ -19,14 +19,14 @@ public class CurrencyRatesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CurrencyRateDto>>> GetCurrencyRates(
         [FromQuery] string? baseCurrency = null,
-        [FromQuery] string? targetCurrency = null,
+        [FromQuery] string[]? targetCurrencies = null,
         [FromQuery] string? sortBy = null,
         [FromQuery] bool sortDescending = false,
         CancellationToken cancellationToken = default)
     {
         var query = new GetCurrencyRatesQuery(
             baseCurrency,
-            targetCurrency,
+            targetCurrencies,
             sortBy,
             sortDescending);
 

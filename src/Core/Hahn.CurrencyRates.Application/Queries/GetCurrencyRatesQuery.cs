@@ -6,6 +6,6 @@ namespace Hahn.CurrencyRates.Application.Queries;
 
 public record GetCurrencyRatesQuery(
     string? BaseCurrency = null,
-    string? TargetCurrency = null,
+    IEnumerable<string>? TargetCurrencies = null,
     string? SortBy = null,
     bool SortDescending = false) : IRequest<IEnumerable<CurrencyRateDto>>;
