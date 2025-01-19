@@ -1,0 +1,29 @@
+@startuml "Currency Fetcher Application"
+!include <C4/C4_Container>
+
+LAYOUT_LEFT_RIGHT()
+LAYOUT_WITH_LEGEND()
+
+Person(user, "User", "Interacts with the system through the frontend.")
+
+System_Boundary(system, "Currency Fetcher Application") {
+    Container(frontend, "Frontend", "Vue.js + TypeScript", "Allows users to view and filter currency data.")
+    Container(webapi, "WebAPI", "ASP.NET Core WebAPI", "Provides API endpoints for the frontend and interacts with the database.")
+    ContainerDb(command_db, "Command Database", "MSSQL", "Stores raw fetched currency data.")
+    ContainerDb(query_db, "Query Database", "MSSQL", "Stores processed and queryable currency events.")
+    Container(worker_service, "Worker Service", ".NET Worker Service", "Processes and schedules data fetching jobs.")
+    Container(hangfire_jobs, "Hangfire Jobs", ".NET Library", "Handles background task scheduling for data processing.")
+}
+
+System_Ext(api_source, "Currency API", "Provides live currency data.")
+
+Rel(user, frontend, "Interacts with", "HTTPS")
+Rel(frontend, webapi, "Sends requests and fetches data", "HTTPS")
+Rel(webapi, query_db, "Queries processed currency data", "SQL")
+Rel(worker_service, api_source, "Fetches live currency data", "HTTP")
+Rel(worker_service, command_db, "Stores raw data", "SQL")
+Rel(worker_service, hangfire_jobs, "Schedules recurring jobs", "Library Call")
+Rel(command_db, query_db, "Streams processed events", "Event Stream")
+
+Lay_R(command_db, query_db)
+@enduml

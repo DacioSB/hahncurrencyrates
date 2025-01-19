@@ -1,0 +1,23 @@
+@startuml SystemContextDiagram
+!include <C4/C4_Context>
+
+' TITLE
+LAYOUT_TOP_DOWN()
+
+' System Context Diagram
+Person(user, "User", "Interacts with the system through the frontend.")
+System_Boundary(system, "Currency Fetcher Application") {
+    System_Ext(api_source, "Currency API", "Provides currency data for consumption.")
+    System(webapi, "WebAPI", "Handles user requests and serves data to the frontend.")
+    System(worker_service, "Worker Service", "Processes and schedules jobs for data fetching.")
+    SystemDb(command_db, "Command Database", "Stores raw currency data.")
+    SystemDb(query_db, "Query Database", "Stores processed currency events.")
+}
+
+Rel(user, webapi, "Requests and views currency data.", "HTTPS")
+Rel(webapi, query_db, "Queries processed currency data.", "SQL")
+Rel(worker_service, api_source, "Fetches currency data.", "HTTP")
+Rel(worker_service, command_db, "Stores raw data.", "SQL")
+Rel(command_db, query_db, "Sends events for processed data.", "Event Stream")
+
+@enduml

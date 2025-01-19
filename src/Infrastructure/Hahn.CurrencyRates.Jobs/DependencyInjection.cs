@@ -20,7 +20,7 @@ public static class DependencyInjection
             "fetch-all-currency-rates",
             job => job.ExecuteForAllBaseCurrenciesAsync(default),
             //each 5 minutes
-            "*/5 * * * *"
+            Cron.Hourly
             );
     }
 }

@@ -1,0 +1,25 @@
+@startuml ComponentDiagram
+!include <C4/C4_Component>
+
+' Component Diagram (focused on Worker Service and Jobs)
+LAYOUT_LEFT_RIGHT()
+
+Container_Boundary(worker_service, "Worker Service") {
+    Component(hangfire_scheduler, "Hangfire Scheduler", ".NET Class", "Schedules recurring jobs.")
+    Component(data_fetcher, "Data Fetcher", ".NET Class", "Fetches data from the Currency API.")
+    Component(event_publisher, "Event Publisher", ".NET Class", "Publishes events to the Query Database.")
+}
+
+Container_Boundary(command_db, "Command Database") {
+    Component(raw_data_table, "Raw Data Table", "MSSQL Table", "Stores fetched currency data.")
+}
+
+Container_Boundary(query_db, "Query Database") {
+    Component(processed_data_table, "Processed Data Table", "MSSQL Table", "Stores processed and queryable currency data.")
+}
+
+Rel(hangfire_scheduler, data_fetcher, "Triggers the fetch operation every 5 minutes.")
+Rel(data_fetcher, raw_data_table, "Stores fetched currency data.")
+Rel(data_fetcher, event_publisher, "Sends processed events.")
+Rel(event_publisher, processed_data_table, "Publishes processed events.")
+@enduml
